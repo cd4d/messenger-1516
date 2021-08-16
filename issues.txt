@@ -1,0 +1,20 @@
+WEEK 1
+ 1) Bug fix: Sending messages #1 
+ 
+There are some bugs in our starting code that we would like you to investigate and resolve. First, when you send a new message, it does not immediately appear on the screen. We would like new messages to be immediately added to the chat UI for both existing conversations and new conversations. (Note: This may require more than one change)
+Additionally, messages are not displayed in the correct order on page load. Messages should be displayed in order with the oldest messages at the top and newest messages at the bottom.
+
+ 2) Feature - Implement a read status for messages #2 
+ 
+ We want to track for each message if it has been read by the recipient, and to make several front end UI updates with this information, such as displaying how many unread messages there are in a given conversation.
+ 
+You can reference the spec in this zip folder* for the various updates to be made to reflect unread messages. (Note that the zip folder includes more than just the spec needed for this feature). Please include a screenshot in your PR description showing your updated UI.
+* https://storage.googleapis.com/hatchways-app.appspot.com/assessments/data/project-overview/4f81e627-c085-4583-a9ef-bf69316a7a55/assets%202.zip
+
+ 3) Feature - Database Redesign #3 
+ 
+ Currently, our app only allows conversations between two users. We would like to allow conversations with groups of 3 or more users. This ticket is not to implement this full change, but to help us plan out what that change would look like. Please make a _draft _PR with the changes to just the database models that you would use to implement this feature. Then, in the PR description, write out notes to answer the following two questions:
+
+    What additional changes are needed to implement this feature (please keep this as a high level summary)
+    If our app were already deployed, what steps would we need to take to move to this new feature without disrupting service for current users
+
