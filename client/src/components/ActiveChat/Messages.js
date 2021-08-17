@@ -5,6 +5,7 @@ import moment from "moment";
 
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
+
   return (
     <Box>
       {messages
@@ -25,7 +26,6 @@ const Messages = (props) => {
         })}
     </Box>
   );
- 
 };
 
 export default Messages;
