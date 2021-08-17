@@ -1,4 +1,4 @@
-import io from "socket.io-client";
+import {io} from "socket.io-client";
 import store from "./store";
 import {
   setNewMessage,
@@ -19,6 +19,7 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
+    console.log("socket data", data);
     store.dispatch(setNewMessage(data.message, data.sender));
   });
 });
