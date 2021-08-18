@@ -78,3 +78,13 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     }
   });
 };
+
+export const sortMessagesByDate = (conversations) => {
+  const sortedConvo = conversations.map((convo) => ({
+    ...convo,
+    messages: convo.messages.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    ),
+  }));
+  return sortedConvo;
+};

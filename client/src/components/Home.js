@@ -16,9 +16,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
   const classes = useStyles();
-  const { user, logout, fetchConversations } = props;
+  const { user, logout, fetchConversations, conversations } = props;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { conversations } = props;
   useEffect(() => {
     if (user.id) {
       setIsLoggedIn(true);
@@ -48,7 +47,7 @@ const Home = (props) => {
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
         <SidebarContainer />
-        <ActiveChat currentConversations={conversations} />
+        <ActiveChat  />
       </Grid>
     </>
   );
