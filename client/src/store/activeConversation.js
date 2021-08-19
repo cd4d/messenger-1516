@@ -2,27 +2,27 @@ import moment from "moment";
 
 const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
 
-export const setActiveChat = (id, username) => {
+export const setActiveChat = (otherUserId, otherUserName) => {
   const now = moment()
   return {
     type: SET_ACTIVE_CHAT,
     payload: {
-      convoWithId: id,
-      convoWithName: username,
+      otherUserId:otherUserId,
+      otherUsername: otherUserName,
       lastActive: now._d,
     },
   };
 };
 
 const reducer = (
-  state = { convoWithId: null, convoWithName: null, lastActive: null },
+  state = { otherUserId: null, otherUserName: null, lastActive: null },
   action
 ) => {
   switch (action.type) {
     case SET_ACTIVE_CHAT: {
       return {
-        convoWithId: action.payload.convoWithId,
-        convoWithName: action.payload.convoWithName,
+        otherUserId: action.payload.otherUserId,
+        otherUsername: action.payload.otherUsername,
         lastActive: action.payload.lastActive,
       };
     }

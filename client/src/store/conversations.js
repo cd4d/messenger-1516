@@ -5,7 +5,6 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   sortMessagesByDate,
-  markUnreadMessages,
   markAllMessagesAsRead,
 } from "./utils/reducerFunctions";
 
@@ -18,7 +17,7 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
-
+const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ"
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -31,16 +30,12 @@ export const gotConversations = (conversations) => {
 export const setNewMessage = (
   message,
   sender,
-  activeConvoWithId,
-  lastActive
 ) => {
   return {
     type: SET_MESSAGE,
     payload: {
       message,
       sender: sender || null,
-      activeConvoWithId: activeConvoWithId || null,
-      lastActive: lastActive || null,
     },
   };
 };
@@ -80,14 +75,21 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
+export const markConversationAsRead = (otherUserId) =>{
+  return {
+    type: MARK_CONVO_AS_READ,
+    otherUserId
+  }
+}
+
 // REDUCER
 
 const reducer = (state = [], action) => {
   switch (action.type) {
     case GET_CONVERSATIONS:
-      const sortedConvos = sortMessagesByDate(action.conversations);
+      return sortMessagesByDate(action.conversations);
       //return markUnreadMessages(sortedConvos);
-      return markAllMessagesAsRead(sortedConvos);
+      // return markAllMessagesAsRead(sortedConvos);
     //return sortMessagesByDate(action.conversations)
     case SET_MESSAGE:
       return addMessageToStore(state, action.payload);
@@ -107,6 +109,8 @@ const reducer = (state = [], action) => {
         action.payload.recipientId,
         action.payload.newMessage
       );
+    case MARK_CONVO_AS_READ:
+      return markAllMessagesAsRead(state, action.otherUserId)
     default:
       return state;
   }

@@ -5,7 +5,9 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  markConversationAsRead
 } from "../conversations";
+import { setActiveChat } from "../activeConversation";
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -84,8 +86,7 @@ const saveMessage = async (body) => {
 };
 
 const sendMessage = (data, body) => {
-  // const newMessage = {...data.message}
-  // newMessage.unread = true
+  
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
@@ -95,14 +96,14 @@ const sendMessage = (data, body) => {
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if it's a brand new conversation
-export const postMessage = (body) => async (dispatch, getState) => {
+export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
-    const { lastActive, convoWithId } = getState().activeConversation;
+
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message, null, convoWithId, lastActive));
+      dispatch(setNewMessage(data.message, null));
     }
     sendMessage(data, body);
   } catch (error) {
@@ -118,3 +119,9 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+
+export const dispatchActiveChat = (otherUserId, otherUserName) => (dispatch) =>{
+  dispatch(markConversationAsRead(otherUserId))
+  dispatch(setActiveChat(otherUserId,otherUserName))
+} 
