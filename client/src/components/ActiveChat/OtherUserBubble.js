@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography, Avatar } from "@material-ui/core";
+import { red } from "@material-ui/core/colors";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -28,12 +29,19 @@ const useStyles = makeStyles(() => ({
     color: "#FFFFFF",
     letterSpacing: -0.2,
     padding: 8
+  },
+  unread: {
+    fontSize: 14,
+    fontWeight: "bold",
+    letterSpacing: -0.2,
+    padding: 8,
+    color:"red"
   }
 }));
 
 const OtherUserBubble = (props) => {
   const classes = useStyles();
-  const { text, time, otherUser } = props;
+  const { text, time, otherUser,unread } = props;
   return (
     <Box className={classes.root}>
       <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatar}></Avatar>
@@ -42,7 +50,7 @@ const OtherUserBubble = (props) => {
           {otherUser.username} {time}
         </Typography>
         <Box className={classes.bubble}>
-          <Typography className={classes.text}>{text}</Typography>
+          <Typography className={unread ? classes.unread : classes.text}>{text}</Typography>
         </Box>
       </Box>
     </Box>

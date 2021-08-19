@@ -5,6 +5,8 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   sortMessagesByDate,
+  markUnreadMessages,
+  markAllMessagesAsRead,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -26,10 +28,20 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender) => {
+export const setNewMessage = (
+  message,
+  sender,
+  activeConvoWithId,
+  lastActive
+) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: {
+      message,
+      sender: sender || null,
+      activeConvoWithId: activeConvoWithId || null,
+      lastActive: lastActive || null,
+    },
   };
 };
 
@@ -73,7 +85,10 @@ export const addConversation = (recipientId, newMessage) => {
 const reducer = (state = [], action) => {
   switch (action.type) {
     case GET_CONVERSATIONS:
-      return sortMessagesByDate(action.conversations);
+      const sortedConvos = sortMessagesByDate(action.conversations);
+      //return markUnreadMessages(sortedConvos);
+      return markAllMessagesAsRead(sortedConvos);
+    //return sortMessagesByDate(action.conversations)
     case SET_MESSAGE:
       return addMessageToStore(state, action.payload);
     case ADD_ONLINE_USER: {
