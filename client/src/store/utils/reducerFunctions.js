@@ -1,6 +1,8 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
-  message.unread = true
+  const { message, sender, currentUser,activeConvo } = payload;
+  if (currentUser !== message.senderId ) {
+    message.unread = true;
+  }
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
@@ -17,7 +19,10 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = { ...convo };
       convoCopy.messages = [...convoCopy.messages, message];
       convoCopy.latestMessageText = message.text;
-
+      convoCopy.unreadCount = convo.messages.reduce(
+        (count, msg) => (msg?.unread ? count + 1 : count),
+        0
+      );
       return convoCopy;
     } else {
       return convo;
@@ -97,24 +102,24 @@ export const markAllMessagesAsRead = (state, otherUserId) => {
   return state.map((convo) => {
     if (convo.otherUser.id === otherUserId) {
       const convoCopy = { ...convo };
-      convoCopy.messages = convoCopy.messages.map(msg => ({ ...msg, unread: false }))
-      return convoCopy
+      convoCopy.messages = convoCopy.messages.map((msg) => ({
+        ...msg,
+        unread: false,
+      }));
+      convoCopy.unreadCount = 0;
+      return convoCopy;
     } else {
-      return convo
+      return convo;
     }
-  }
-  )
-
+  });
 };
-export const markUnreadMessages = (conversations) => {
-  return conversations.map((convo) => ({
-    ...convo,
-    messages: convo.messages.map((msg) => {
-      msg.unread =
-        new Date(msg.createdAt).getTime() >
-        new Date(convo.lastActive).getTime();
 
-      return msg;
-    }),
-  }));
-};
+// export const countUnreadMessages = (conversations) => {
+//   return conversations.map((convo) => ({
+//     ...convo,
+//     unreadCount: convo.messages.reduce(
+//       (acc, curr) => (curr.unread ? acc + 1 : acc),
+//       0
+//     ),
+//   }));
+// };

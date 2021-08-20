@@ -2,7 +2,6 @@ import React from "react";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
-import { setActiveChat } from "../../store/activeConversation";
 import { dispatchActiveChat } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
@@ -27,6 +26,7 @@ const Chat = (props) => {
 
   const handleClick = async (conversation) => {
     await props.setActiveChat(
+      conversation.id,
       conversation.otherUser.id,
       conversation.otherUser.username
     );
@@ -39,6 +39,7 @@ const Chat = (props) => {
         username={otherUser.username}
         online={otherUser.online}
         sidebar={true}
+        
       />
       <ChatContent conversation={conversation} />
     </Box>
@@ -47,8 +48,8 @@ const Chat = (props) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setActiveChat: (otherUserId, otherUserName) => {
-      dispatch(dispatchActiveChat(otherUserId, otherUserName));
+    setActiveChat: (convoId, otherUserId, otherUserName) => {
+      dispatch(dispatchActiveChat(convoId, otherUserId, otherUserName));
     },
   };
 };

@@ -5,7 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
-  markConversationAsRead
+  markConversationAsRead,
 } from "../conversations";
 import { setActiveChat } from "../activeConversation";
 import { gotUser, setFetchingStatus } from "../user";
@@ -82,11 +82,12 @@ export const fetchConversations = () => async (dispatch) => {
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
+  console.log("data:", data);
+  console.log("body:", body);
   return data;
 };
 
 const sendMessage = (data, body) => {
-  
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
@@ -96,14 +97,15 @@ const sendMessage = (data, body) => {
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if it's a brand new conversation
-export const postMessage = (body) => async (dispatch) => {
+export const postMessage = (body) => async (dispatch, getState) => {
   try {
     const data = await saveMessage(body);
-
+    const currentUser = getState().user.id;
+    const activeConvo = getState().activeConversation;
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message, null));
+      dispatch(setNewMessage(data.message, null, currentUser, activeConvo));
     }
     sendMessage(data, body);
   } catch (error) {
@@ -120,8 +122,9 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-
-export const dispatchActiveChat = (otherUserId, otherUserName) => (dispatch) =>{
-  dispatch(markConversationAsRead(otherUserId))
-  dispatch(setActiveChat(otherUserId,otherUserName))
-} 
+export const dispatchActiveChat = (convoId, otherUserId, otherUserName) => (
+  dispatch
+) => {
+  dispatch(markConversationAsRead(otherUserId));
+  dispatch(setActiveChat(convoId, otherUserId, otherUserName));
+};

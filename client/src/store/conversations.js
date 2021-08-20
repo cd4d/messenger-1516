@@ -6,6 +6,7 @@ import {
   addMessageToStore,
   sortMessagesByDate,
   markAllMessagesAsRead,
+  countUnreadMessages,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -17,7 +18,7 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
-const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ"
+const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -27,15 +28,14 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (
-  message,
-  sender,
-) => {
+export const setNewMessage = (message, sender, currentUser,activeConvo) => {
   return {
     type: SET_MESSAGE,
     payload: {
       message,
       sender: sender || null,
+      currentUser: currentUser || null,
+      activeConvo:activeConvo || null
     },
   };
 };
@@ -75,12 +75,12 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const markConversationAsRead = (otherUserId) =>{
+export const markConversationAsRead = (otherUserId) => {
   return {
     type: MARK_CONVO_AS_READ,
-    otherUserId
-  }
-}
+    otherUserId,
+  };
+};
 
 // REDUCER
 
@@ -88,9 +88,6 @@ const reducer = (state = [], action) => {
   switch (action.type) {
     case GET_CONVERSATIONS:
       return sortMessagesByDate(action.conversations);
-      //return markUnreadMessages(sortedConvos);
-      // return markAllMessagesAsRead(sortedConvos);
-    //return sortMessagesByDate(action.conversations)
     case SET_MESSAGE:
       return addMessageToStore(state, action.payload);
     case ADD_ONLINE_USER: {
@@ -110,7 +107,7 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case MARK_CONVO_AS_READ:
-      return markAllMessagesAsRead(state, action.otherUserId)
+      return markAllMessagesAsRead(state, action.otherUserId);
     default:
       return state;
   }

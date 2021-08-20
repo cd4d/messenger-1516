@@ -38,7 +38,6 @@ const UserAvatar = (props) => {
       >
         <Avatar alt={username} src={photoUrl} className={classes.profilePic} />
       </Badge>
-      <Badge badgeContent={4}></Badge>
     </Box>
   );
 };
