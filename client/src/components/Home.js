@@ -25,6 +25,7 @@ const Home = (props) => {
   }, [user.id]);
 
   useEffect(() => {
+    window.localStorage.removeItem("activeConvo")
     fetchConversations();
   }, [fetchConversations]);
 
