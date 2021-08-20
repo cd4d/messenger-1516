@@ -82,8 +82,6 @@ export const fetchConversations = () => async (dispatch) => {
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
-  console.log("data:", data);
-  console.log("body:", body);
   return data;
 };
 
@@ -91,8 +89,7 @@ const sendMessage = (data, body) => {
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
-    sender: data.sender,
-  });
+    sender: data.sender  });
 };
 
 // message format to send: {recipientId, text, conversationId}
@@ -100,12 +97,12 @@ const sendMessage = (data, body) => {
 export const postMessage = (body) => async (dispatch, getState) => {
   try {
     const data = await saveMessage(body);
-    const currentUser = getState().user.id;
-    const activeConvo = getState().activeConversation;
+    const userSending = getState().user.id;
+    const activeConvo = getState().activeConversation; // only works for sending user, using localStorage instead in addMessageToStore
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message, null, currentUser, activeConvo));
+      dispatch(setNewMessage(data.message, null, userSending));
     }
     sendMessage(data, body);
   } catch (error) {

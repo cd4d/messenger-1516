@@ -4,6 +4,8 @@ const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
 
 export const setActiveChat = (convoId, otherUserId, otherUserName) => {
   const now = moment();
+  const activeConvo = otherUserId
+  window.localStorage.setItem("activeConvo", JSON.stringify(activeConvo))
   return {
     type: SET_ACTIVE_CHAT,
     payload: {
@@ -16,7 +18,7 @@ export const setActiveChat = (convoId, otherUserId, otherUserName) => {
 };
 
 const reducer = (
-  state = {convoId:null, otherUserId: null, otherUserName: null, lastActive: null },
+  state = { convoId: null, otherUserId: null, otherUserName: null, lastActive: null },
   action
 ) => {
   switch (action.type) {

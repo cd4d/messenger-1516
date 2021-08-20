@@ -6,7 +6,6 @@ import {
   addMessageToStore,
   sortMessagesByDate,
   markAllMessagesAsRead,
-  countUnreadMessages,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -28,14 +27,13 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender, currentUser,activeConvo) => {
+export const setNewMessage = (message, sender, userSending) => {
   return {
     type: SET_MESSAGE,
     payload: {
       message,
       sender: sender || null,
-      currentUser: currentUser || null,
-      activeConvo:activeConvo || null
+      userSending: userSending || null,
     },
   };
 };

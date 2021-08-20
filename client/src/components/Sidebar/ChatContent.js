@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#9CADC8",
     letterSpacing: -0.17,
   },
-  previewTextBold: {
+  previewTextUnread: {
     fontSize: 12,
     letterSpacing: -0.17,
     fontWeight: "bolder",
@@ -43,7 +43,7 @@ const ChatContent = (props) => {
         </Typography>
         <Typography
           className={
-            unreadCount ? classes.previewTextBold : classes.previewText
+            unreadCount ? classes.previewTextUnread : classes.previewText
           }
         >
           {latestMessageText}

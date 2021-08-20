@@ -1,7 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography, Avatar } from "@material-ui/core";
-import { red } from "@material-ui/core/colors";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -35,7 +34,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: "bold",
     letterSpacing: -0.2,
     padding: 8,
-    color:"red"
+    color:"dimgray"
   }
 }));
 
