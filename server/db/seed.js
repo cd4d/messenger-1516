@@ -2,7 +2,8 @@ const db = require("./db");
 const { User } = require("./models");
 const Conversation = require("./models/conversation");
 const Message = require("./models/message");
-
+const Group = require("./models/group")
+const GroupMessage = require("./models/groupMessage")
 async function seed() {
   await db.sync({ force: true });
   console.log("db synced!");
@@ -23,23 +24,23 @@ async function seed() {
       "https://res.cloudinary.com/dmlvthmqr/image/upload/v1607914466/messenger/775db5e79c5294846949f1f55059b53317f51e30_s3back.png",
   });
 
-  const santaigoConvo = await Conversation.create({
+  const santiagoConvo = await Conversation.create({
     user1Id: thomas.id,
     user2Id: santiago.id,
   });
 
   await Message.create({
-    conversationId: santaigoConvo.id,
+    conversationId: santiagoConvo.id,
     senderId: santiago.id,
     text: "Where are you from?",
   });
   await Message.create({
-    conversationId: santaigoConvo.id,
+    conversationId: santiagoConvo.id,
     senderId: thomas.id,
     text: "I'm from New York",
   });
   await Message.create({
-    conversationId: santaigoConvo.id,
+    conversationId: santiagoConvo.id,
     senderId: santiago.id,
     text: "Share photo of your city, please",
   });
@@ -114,6 +115,23 @@ async function seed() {
   ]);
 
   console.log(`seeded users and messages`);
+  try {
+    const groupOne = await Group.create({
+      name: "groupOne",
+      adminId:thomas.id
+    })
+    await groupOne.addUsers([thomas.id, santiago.id, chiumbo.id])
+
+    await GroupMessage.create({
+      groupId: groupOne.id,
+      senderId: chiumbo.id,
+      text: "Group message test."
+    })
+
+  } catch (error) {
+    console.log(error)
+  }
+  console.log(`seeded groups and messages`);
 }
 
 async function runSeed() {

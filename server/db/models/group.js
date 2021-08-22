@@ -6,11 +6,16 @@ const Group = db.define("group", {
         type: Sequelize.STRING,
         allowNull: false
     },
-    admin: {
+    adminId: {
         allowNull: false,
         type: Sequelize.INTEGER
     }
 });
 
+Group.findGroup = async function (groupId) {
+    const group = await Group.findByPk(groupId)
+    return group
+
+}
 
 module.exports = Group
