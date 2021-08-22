@@ -4,14 +4,12 @@ const User = require("./user");
 
 
 const GroupUser = db.define("groupuser", {
-    // userId:{
-    //     type: Sequelize.INTEGER,
-    //     allowNull:false,
-    // },
-    // groupId:{
-    //     type: Sequelize.INTEGER,
-    //     allowNull:false,
-    // }
-});
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+})
 
 module.exports = GroupUser
