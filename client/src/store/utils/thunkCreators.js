@@ -89,7 +89,9 @@ const sendMessage = (data, body) => {
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
-    sender: data.sender  });
+    sender: data.sender,
+    activeConvo: data.activeConvo
+  });
 };
 
 // message format to send: {recipientId, text, conversationId}
@@ -98,11 +100,10 @@ export const postMessage = (body) => async (dispatch, getState) => {
   try {
     const data = await saveMessage(body);
     const userSending = getState().user.id;
-    const activeConvo = getState().activeConversation; // only works for sending user, using localStorage instead in addMessageToStore
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message, null, userSending));
+      dispatch(setNewMessage(data.message, data.sender, data.activeConvo));
     }
     sendMessage(data, body);
   } catch (error) {
@@ -119,7 +120,7 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const dispatchActiveChat = (convoId, otherUserId, otherUserName) => (
+export const activeChatThunk = (convoId, otherUserId, otherUserName) => (
   dispatch
 ) => {
   dispatch(markConversationAsRead(otherUserId));

@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
-import { dispatchActiveChat } from "../../store/utils/thunkCreators";
+import { activeChatThunk } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -39,7 +39,7 @@ const Chat = (props) => {
         username={otherUser.username}
         online={otherUser.online}
         sidebar={true}
-        
+
       />
       <ChatContent conversation={conversation} />
     </Box>
@@ -49,7 +49,7 @@ const Chat = (props) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setActiveChat: (convoId, otherUserId, otherUserName) => {
-      dispatch(dispatchActiveChat(convoId, otherUserId, otherUserName));
+      dispatch(activeChatThunk(convoId, otherUserId, otherUserName));
     },
   };
 };

@@ -1,10 +1,11 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender, userSending } = payload;
-  const activeConvo = JSON.parse(window.localStorage.getItem("activeConvo"))
-  const isUnreadMessage = (userSending !== message.senderId && activeConvo !== message.senderId)
-  if (isUnreadMessage) {
-    message.unread = true;
-  }
+  const { message, sender,activeConvo } = payload;
+  console.log("addToMessage PAYLOAD:", payload)
+  //const activeConvo = JSON.parse(window.localStorage.getItem("activeConvo"))
+  // const isUnreadMessage = (userSending !== message.senderId && activeConvo !== message.senderId)
+  // if (isUnreadMessage) {
+  //   message.unread = true;
+  // }
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
@@ -21,12 +22,12 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = { ...convo };
       convoCopy.messages = [...convoCopy.messages, message];
       convoCopy.latestMessageText = message.text;
-      if (isUnreadMessage) {
-        convoCopy.unreadCount = convo.messages.reduce(
-          (count, msg) => (msg?.unread ? count + 1 : count),
-          1
-        );
-      }
+      // if (isUnreadMessage) {
+      //   convoCopy.unreadCount = convo.messages.reduce(
+      //     (count, msg) => (msg?.unread ? count + 1 : count),
+      //     1
+      //   );
+      // }
 
       return convoCopy;
     } else {
