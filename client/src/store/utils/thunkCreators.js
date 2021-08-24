@@ -90,20 +90,19 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
-    activeConvo: data.activeConvo
+    activeConvoId: data.activeConvoId
   });
 };
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if it's a brand new conversation
-export const postMessage = (body) => async (dispatch, getState) => {
+export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
-    const userSending = getState().user.id;
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message, data.sender, data.activeConvo));
+      dispatch(setNewMessage(data.message, data.sender, data.activeConvoId));
     }
     sendMessage(data, body);
   } catch (error) {

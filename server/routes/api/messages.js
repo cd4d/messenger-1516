@@ -27,6 +27,7 @@ router.post("/", async (req, res, next) => {
       conversation = await Conversation.create({
         user1Id: senderId,
         user2Id: recipientId,
+        unreadCount: 1,
       });
       if (onlineUsers.includes(sender.id)) {
         sender.online = true;
@@ -35,6 +36,7 @@ router.post("/", async (req, res, next) => {
     const message = await Message.create({
       senderId,
       text,
+      isUnread: true,
       conversationId: conversation.id,
     });
     res.json({ message, sender });
@@ -43,4 +45,19 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.patch("/markUnread", async (req, res, next) => {
+  console.log(req.body);
+  await Message.update(
+    { isUnread: true },
+    {
+      where: { id: req.body.message.id },
+    }
+  );
+  await Conversation.increment(
+    { unreadCount: 1 },
+    {
+      where: { id: req.body.message.conversationId },
+    }
+  );
+});
 module.exports = router;

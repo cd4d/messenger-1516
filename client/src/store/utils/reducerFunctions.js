@@ -1,11 +1,8 @@
+import axios from "axios";
+
 export const addMessageToStore = (state, payload) => {
-  const { message, sender,activeConvo } = payload;
-  console.log("addToMessage PAYLOAD:", payload)
-  //const activeConvo = JSON.parse(window.localStorage.getItem("activeConvo"))
-  // const isUnreadMessage = (userSending !== message.senderId && activeConvo !== message.senderId)
-  // if (isUnreadMessage) {
-  //   message.unread = true;
-  // }
+  const { message, sender, activeConvoId, currentUserId } = payload;
+  console.log("addToMessage PAYLOAD:", payload);
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
@@ -14,14 +11,20 @@ export const addMessageToStore = (state, payload) => {
       messages: [message],
     };
     newConvo.latestMessageText = message.text;
+    console.log("brand new convo", newConvo);
+    console.log("state", state);
     return [newConvo, ...state];
   }
+  
 
   return state.map((convo) => {
+    
     if (convo.id === message.conversationId) {
       const convoCopy = { ...convo };
+      // 
       convoCopy.messages = [...convoCopy.messages, message];
       convoCopy.latestMessageText = message.text;
+      
       // if (isUnreadMessage) {
       //   convoCopy.unreadCount = convo.messages.reduce(
       //     (count, msg) => (msg?.unread ? count + 1 : count),
@@ -110,7 +113,7 @@ export const markAllMessagesAsRead = (state, otherUserId) => {
       const convoCopy = { ...convo };
       convoCopy.messages = convoCopy.messages.map((msg) => ({
         ...msg,
-        unread: false,
+        isUnread: false,
       }));
       convoCopy.unreadCount = 0;
       return convoCopy;
@@ -119,5 +122,3 @@ export const markAllMessagesAsRead = (state, otherUserId) => {
     }
   });
 };
-
-
