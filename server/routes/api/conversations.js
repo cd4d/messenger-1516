@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Conversation, Message } = require("../../db/models");
-const { Op } = require("sequelize");
+const { Op, QueryInterface } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
 // get all conversations for a user, include latest message text for preview, and all messages
@@ -18,7 +18,7 @@ router.get("/", async (req, res, next) => {
           user2Id: userId,
         },
       },
-      attributes: ["id"],
+      attributes: ["id", "unreadCount"],
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
@@ -71,11 +71,30 @@ router.get("/", async (req, res, next) => {
       convoJSON.latestMessageText = convoJSON.messages[0].text;
       conversations[i] = convoJSON;
     }
-
     res.json(conversations);
   } catch (error) {
     next(error);
   }
 });
+
+router.patch("/markConvoAsRead", async (req, res, next) => {
+  console.log(req.body);
+  const userId = req.user.id;
+  // await Conversation.update({ unreadCount: 0 }, {
+  //   where:
+  //     { id: req.body.convoId }
+  // })
+
+  await Message.update({ isUnread: false }, {
+    where: {
+       senderId: req.body.otherUserid 
+      // [Op.not]: { senderId: undefined },
+      // [Op.and]: [{ senderId: req.body.otherUserid }, {
+      //   conversationId: req.body.convoId
+      // }]
+    }
+   })
+  // await QueryInterface.bulkUpdate("messages", { isUnread: false }, { senderId: req.body.otherUserid, conversationId: req.body.convoId })
+})
 
 module.exports = router;

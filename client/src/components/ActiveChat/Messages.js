@@ -19,7 +19,7 @@ const Messages = (props) => {
             text={message.text}
             time={time}
             otherUser={otherUser}
-            unread={message.isUnread || false}
+            isUnread={message.isUnread || false}
           />
         );
       })}

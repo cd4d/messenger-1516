@@ -31,16 +31,12 @@ export const setNewMessage = (
   message,
   sender,
   activeConvoId,
-  currentUserId
 ) => {
   return {
     type: SET_MESSAGE,
     payload: {
       message,
       sender: sender || null,
-      activeConvoId: activeConvoId || null,
-      currentUserId: currentUserId || null,
-      isUnread: false,
     },
   };
 };

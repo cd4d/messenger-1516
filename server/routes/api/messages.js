@@ -50,13 +50,13 @@ router.patch("/markUnread", async (req, res, next) => {
   await Message.update(
     { isUnread: true },
     {
-      where: { id: req.body.message.id },
+      where: { id: req.body.id },
     }
   );
   await Conversation.increment(
     { unreadCount: 1 },
     {
-      where: { id: req.body.message.conversationId },
+      where: { id: req.body.conversationId },
     }
   );
 });

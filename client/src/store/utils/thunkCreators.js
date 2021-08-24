@@ -90,7 +90,6 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
-    activeConvoId: data.activeConvoId
   });
 };
 
@@ -122,6 +121,9 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
 export const activeChatThunk = (convoId, otherUserId, otherUserName) => (
   dispatch
 ) => {
-  dispatch(markConversationAsRead(otherUserId));
-  dispatch(setActiveChat(convoId, otherUserId, otherUserName));
+  axios.patch("api/conversations/markConvoAsRead", { convoId, otherUserId })
+  .then(dispatch(markConversationAsRead(otherUserId)))
+  .then(dispatch(setActiveChat(convoId, otherUserId, otherUserName)))
+
+    ;
 };

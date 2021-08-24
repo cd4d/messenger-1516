@@ -26,16 +26,15 @@ socket.on("connect", () => {
     console.log("message", data.message);
     console.log("activeConvo", activeConvoId);
     console.log("currentUserId", currentUserId);
-    const msgCopy = { ...data.message };
+    // const msgCopy = { ...data.message };
 
     if (!activeConvoId) {
       console.log("msg is unread");
-      msgCopy.isUnread = true;
-      axios.patch("/api/messages/markUnread", { msgCopy });
-      //convoCopy.unreadCount++
+      data.message.isUnread = true;
+      axios.patch("/api/messages/markUnread", data.message );
     }
     store.dispatch(
-      setNewMessage(msgCopy, data.sender, activeConvoId, currentUserId)
+      setNewMessage(data.message, data.sender)
     );
   });
 });
