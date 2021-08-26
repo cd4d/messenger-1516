@@ -13,7 +13,7 @@ const Messages = (props) => {
         const time = moment(message.createdAt).format("h:mm");
 
         return message.senderId === userId ? (
-          <SenderBubble key={uuidv4()} text={message.text} time={time} />
+          <SenderBubble key={uuidv4()} text={message.text} time={time} isUnread={message.isUnread || false}/>
         ) : (
           <OtherUserBubble
             key={uuidv4()}

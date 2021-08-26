@@ -89,16 +89,19 @@ const saveMessage = async (body) => {
 const sendMessage = (data, body) => {
   console.log("sendmsg data", data);
   console.log("sendmsg body", body);
+  const conversation = data.newConversation
+      ? data.newConversation
+      : data.updatedConversation[0][0][0];
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
-    conversation: data.newConversation,
+    conversation: conversation,
   });
 };
 
 export const sendReadUpdate = (message) => {
-  console.log("send read update");
+  console.log("emit read update");
   socket.emit("message-read", message);
 };
 

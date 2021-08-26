@@ -21,7 +21,6 @@ const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
 const MARK_MESSAGE_AS_READ = "MARK_MESSAGE_AS_READ";
-const MARK_RECIPIENT_CONVO_AS_READ = "MARK_RECIPIENT_CONVO_AS_READ";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -91,12 +90,7 @@ export const messageWasRead = (message) => {
     message,
   };
 };
-export const markRecipientConvoAsRead = (convo) => {
-  return {
-    type: MARK_RECIPIENT_CONVO_AS_READ,
-    convo,
-  };
-};
+
 
 // REDUCER
 
@@ -129,8 +123,6 @@ const reducer = (state = [], action) => {
       );
     case MARK_MESSAGE_AS_READ:
       return markMessageAsRead(state, action.message);
-    case MARK_RECIPIENT_CONVO_AS_READ:
-      return recipientConvoAsReadToStore(state, action.convo);
     default:
       return state;
   }

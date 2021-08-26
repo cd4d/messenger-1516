@@ -132,21 +132,17 @@ export const markAllMessagesAsRead = (state, conversation, currentUser) => {
     }
   });
 };
-export const recipientConvoAsReadToStore = (state, data) => {
-  console.log("recipient convo data", data);
-  return state;
-};
 
-export const markMessageAsRead = (state, message) => {
-  console.log("mark read msg");
+
+export const markMessageAsRead = (state, data) => {
   return state.map((convo) => {
-    if (convo.id === message.conversationId) {
+    if (convo.id === data.message.conversationId) {
       const convoCopy = {
         ...convo,
-      };
-      convoCopy.messages.map((msg) =>
-        msg.id === message.id ? (msg.isUnread = false) : msg
-      );
+        messages: convo.messages.map((msg) =>
+          msg.id === data.message.id ? { ...msg, isUnread: false } : msg
+        )
+      }
       return convoCopy;
     }
     return convo;

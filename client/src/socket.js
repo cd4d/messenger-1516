@@ -31,29 +31,36 @@ socket.on("connect", () => {
       store.dispatch(
         setNewMessage(data.message, data.sender, data.conversation)
       );
+      return
     } else {
       console.log("active convo msg read");
       axios
         .patch("/api/messages/markRead", data.message)
         .then((res) => {
+          console.log("active convo res", res);
           store.dispatch(
             setNewMessage(
-              data.message,
+              res.data.readMessage[1][0],
               data.sender,
-              res.data ? res.data[0][0][0] : JSON.parse(res.config.data)
+              res.data ? res.data.updatedConvo[0][0][0] : JSON.parse(res.config.data)
             )
           );
+          sendReadUpdate(res.data.readMessage[1][0])
         })
+        // .finally(sendReadUpdate(res.data.readMessage[1][0]))
         .catch((error) => {
           console.error(error);
         });
 
-      sendReadUpdate(data.message);
+
     }
   });
   socket.on("message-read", (message) => {
     store.dispatch(messageWasRead(message));
   });
+
+
+
   socket.on("convo-read-status", (data) => {
     const currentUser = store.getState().user;
     const conversation = data.conversation;

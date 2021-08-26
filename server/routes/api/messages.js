@@ -71,10 +71,11 @@ router.patch("/markRead", async (req, res, next) => {
     const conversation = await Conversation.findOne({
       where: { id: req.body.conversationId },
     });
-    await Message.update(
+    const readMessage = await Message.update(
       { isUnread: false },
       {
         where: { id: req.body.id },
+        returning:true
       }
     );
     const receiverId =
@@ -82,14 +83,14 @@ router.patch("/markRead", async (req, res, next) => {
         ? conversation.dataValues.user1Id
         : conversation.dataValues.user2Id;
 
-    if (receiverId === conversation.dataValues.user1Id) {
+    if (receiverId === conversation.dataValues.user1Id && conversation.dataValues.userOneUnreadCount > 0) {
       updatedConvo = await Conversation.decrement(
         { userOneUnreadCount: 1 },
         {
           where: { id: req.body.conversationId },
         }
       );
-    } else if (receiverId === conversation.dataValues.user2Id) {
+    } else if (receiverId === conversation.dataValues.user2Id && conversation.dataValues.userTwoUnreadCount > 0) {
       updatedConvo = await Conversation.decrement(
         { userTwoUnreadCount: 1 },
         {
@@ -97,7 +98,7 @@ router.patch("/markRead", async (req, res, next) => {
         }
       );
     }
-    res.json(updatedConvo);
+    res.json({updatedConvo, readMessage});
   } catch (error) {
     next(error);
   }
