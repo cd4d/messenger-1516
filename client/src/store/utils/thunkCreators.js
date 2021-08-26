@@ -93,7 +93,7 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
-    conversation: data.updatedConversation[0][0][0],
+    conversation: data.newConversation,
   });
 };
 
