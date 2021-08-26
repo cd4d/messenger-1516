@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Conversation, Message } = require("../../db/models");
-const { Op, QueryInterface } = require("sequelize");
+const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
 // get all conversations for a user, include latest message text for preview, and all messages
@@ -18,7 +18,13 @@ router.get("/", async (req, res, next) => {
           user2Id: userId,
         },
       },
-      attributes: ["id", "unreadCount"],
+      attributes: [
+        "id",
+        "user1Id",
+        "user2Id",
+        "userOneUnreadCount",
+        "userTwoUnreadCount",
+      ],
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
@@ -78,23 +84,46 @@ router.get("/", async (req, res, next) => {
 });
 
 router.patch("/markConvoAsRead", async (req, res, next) => {
-  console.log(req.body);
-  const userId = req.user.id;
-  // await Conversation.update({ unreadCount: 0 }, {
-  //   where:
-  //     { id: req.body.convoId }
-  // })
-
-  await Message.update({ isUnread: false }, {
-    where: {
-       senderId: req.body.otherUserid 
-      // [Op.not]: { senderId: undefined },
-      // [Op.and]: [{ senderId: req.body.otherUserid }, {
-      //   conversationId: req.body.convoId
-      // }]
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
     }
-   })
-  // await QueryInterface.bulkUpdate("messages", { isUnread: false }, { senderId: req.body.otherUserid, conversationId: req.body.convoId })
-})
+    const targetConversation = await Conversation.findOne({
+      where: { id: req.body.convoId },
+    });
+    let updatedConversation;
+    if (targetConversation) {
+    }
+    if (req.user.id === targetConversation.dataValues.user1Id) {
+      updatedConversation = await Conversation.update(
+        { userOneUnreadCount: 0 },
+        { returning: true, plain: true, where: { id: req.body.convoId } }
+      );
+    } else if (req.user.id === targetConversation.dataValues.user2Id) {
+      updatedConversation = await Conversation.update(
+        { userTwoUnreadCount: 0 },
+        { returning: true, plain: true, where: { id: req.body.convoId } }
+      );
+    }
+
+    const updatedMessages = await Message.update(
+      { isUnread: false },
+      {
+        where: {
+          [Op.and]: [
+            { senderId: { [Op.not]: req.user.id } },
+            {
+              conversationId: req.body.convoId,
+            },
+          ],
+        },
+        returning: true,
+      }
+    );
+    res.send({ updatedConversation });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

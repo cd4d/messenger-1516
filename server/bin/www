@@ -24,7 +24,7 @@ app.set("port", port);
  */
 
 const server = http.createServer(app);
-
+const { markUnread } = "../routes/api/messages";
 /**
  * Listen on provided port, on all network interfaces, and sync database.
  */
@@ -41,9 +41,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
+    console.log("newmsg data", data);
     socket.broadcast.emit("new-message", {
       message: data.message,
       sender: data.sender,
+      conversation:data.conversation
+    });
+  });
+  socket.on("message-read", (message) => {
+    socket.broadcast.emit("unread-status", {
+      message,
+    });
+  });
+  socket.on("conversation-read", (conversation) => {
+    console.log("conversation read", conversation);
+    socket.broadcast.emit("convo-read-status", {
+      conversation,
     });
   });
 

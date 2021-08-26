@@ -32,9 +32,21 @@ const useStyles = makeStyles((theme) => ({
 const ChatContent = (props) => {
   const classes = useStyles();
 
-  const { conversation } = props;
-  const { latestMessageText, otherUser, unreadCount } = conversation;
-
+  const { conversation, user } = props;
+  const {
+    latestMessageText,
+    otherUser,
+    userOneUnreadCount,
+    userTwoUnreadCount,
+    user1Id,
+    user2Id
+  } = conversation;
+  let unreadCount = null;
+  if (user.id === user1Id) {
+    unreadCount = userOneUnreadCount;
+  } else if (user.id === user2Id) {
+    unreadCount = userTwoUnreadCount;
+  }
   return (
     <Box className={classes.root}>
       <Box>

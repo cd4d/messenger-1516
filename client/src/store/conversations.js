@@ -6,6 +6,8 @@ import {
   addMessageToStore,
   sortMessagesByDate,
   markAllMessagesAsRead,
+  markMessageAsRead,
+  recipientConvoAsReadToStore
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -18,6 +20,8 @@ const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
+const MARK_MESSAGE_AS_READ = "MARK_MESSAGE_AS_READ";
+const MARK_RECIPIENT_CONVO_AS_READ = "MARK_RECIPIENT_CONVO_AS_READ";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -27,16 +31,13 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (
-  message,
-  sender,
-  activeConvoId,
-) => {
+export const setNewMessage = (message, sender, conversation) => {
   return {
     type: SET_MESSAGE,
     payload: {
       message,
       sender: sender || null,
+      conversation: conversation || null, // conversation with updated unread counts
     },
   };
 };
@@ -69,17 +70,31 @@ export const clearSearchedUsers = () => {
 };
 
 // add new conversation when sending a new message
-export const addConversation = (recipientId, newMessage) => {
+export const addConversation = (recipientId, message, conversation) => {
   return {
     type: ADD_CONVERSATION,
-    payload: { recipientId, newMessage },
+    payload: { recipientId,  message, conversation },
   };
 };
 
-export const markConversationAsRead = (otherUserId) => {
+export const markConversationAsRead = (conversation, currentUser) => {
   return {
     type: MARK_CONVO_AS_READ,
-    otherUserId,
+    conversation,
+    currentUser,
+  };
+};
+
+export const messageWasRead = (message) => {
+  return {
+    type: MARK_MESSAGE_AS_READ,
+    message,
+  };
+};
+export const markRecipientConvoAsRead = (convo) => {
+  return {
+    type: MARK_RECIPIENT_CONVO_AS_READ,
+    convo,
   };
 };
 
@@ -104,11 +119,18 @@ const reducer = (state = [], action) => {
     case ADD_CONVERSATION:
       return addNewConvoToStore(
         state,
-        action.payload.recipientId,
-        action.payload.newMessage
+        action.payload
       );
     case MARK_CONVO_AS_READ:
-      return markAllMessagesAsRead(state, action.otherUserId);
+      return markAllMessagesAsRead(
+        state,
+        action.conversation,
+        action.currentUser
+      );
+    case MARK_MESSAGE_AS_READ:
+      return markMessageAsRead(state, action.message);
+    case MARK_RECIPIENT_CONVO_AS_READ:
+      return recipientConvoAsReadToStore(state, action.convo);
     default:
       return state;
   }

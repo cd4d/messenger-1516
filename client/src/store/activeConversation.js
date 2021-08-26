@@ -2,12 +2,10 @@
 const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
 
 export const setActiveChat = (convoId, otherUserId, otherUserName) => {
-  const activeConvo = otherUserId
-  window.localStorage.setItem("activeConvo", JSON.stringify(activeConvo))
   return {
     type: SET_ACTIVE_CHAT,
     payload: {
-      convoId,
+      convoId: convoId || null,
       otherUserId,
       otherUserName,
     },

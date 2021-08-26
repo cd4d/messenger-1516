@@ -48,10 +48,6 @@ const CurrentUser = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user
-  };
-};
 
-export default connect(mapStateToProps)(CurrentUser);
+
+export default connect(null)(CurrentUser);

@@ -1,9 +1,13 @@
 const { Op, DataTypes } = require("sequelize");
 const db = require("../db");
-const Message = require("./message");
 
 const Conversation = db.define("conversation", {
-  unreadCount: {
+  userOneUnreadCount: {
+    type: DataTypes.INTEGER,
+    defaultValue:0,
+    validate: { min: 0 },
+  },
+  userTwoUnreadCount: {
     type: DataTypes.INTEGER,
     defaultValue:0,
     validate: { min: 0 },

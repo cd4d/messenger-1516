@@ -6,8 +6,10 @@ import {
   setNewMessage,
   removeOfflineUser,
   addOnlineUser,
+  messageWasRead,
+  markConversationAsRead,
 } from "./store/conversations";
-
+import { sendReadUpdate } from "./store/utils/thunkCreators";
 const socket = io(window.location.origin);
 
 socket.on("connect", () => {
@@ -21,21 +23,41 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
+    console.log("socket newmsg data", data);
     const activeConvoId = store.getState().activeConversation.convoId;
-    const currentUserId = store.getState().user.id;
-    console.log("message", data.message);
-    console.log("activeConvo", activeConvoId);
-    console.log("currentUserId", currentUserId);
-    // const msgCopy = { ...data.message };
 
-    if (!activeConvoId) {
+    if (activeConvoId !== data.message.conversationId) {
       console.log("msg is unread");
-      data.message.isUnread = true;
-      axios.patch("/api/messages/markUnread", data.message );
+      store.dispatch(
+        setNewMessage(data.message, data.sender, data.conversation)
+      );
+    } else {
+      console.log("active convo msg read");
+      axios
+        .patch("/api/messages/markRead", data.message)
+        .then((res) => {
+          store.dispatch(
+            setNewMessage(
+              data.message,
+              data.sender,
+              res.data ? res.data[0][0][0] : JSON.parse(res.config.data)
+            )
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      sendReadUpdate(data.message);
     }
-    store.dispatch(
-      setNewMessage(data.message, data.sender)
-    );
+  });
+  socket.on("message-read", (message) => {
+    store.dispatch(messageWasRead(message));
+  });
+  socket.on("convo-read-status", (data) => {
+    const currentUser = store.getState().user;
+    const conversation = data.conversation;
+    store.dispatch(markConversationAsRead(conversation, currentUser));
   });
 });
 
