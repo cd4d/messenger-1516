@@ -7,7 +7,6 @@ import {
   sortMessagesByDate,
   markAllMessagesAsRead,
   markMessageAsRead,
-  recipientConvoAsReadToStore
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -19,8 +18,9 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
-const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
 const MARK_MESSAGE_AS_READ = "MARK_MESSAGE_AS_READ";
+export const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
+export const MARK_RECIPIENT_CONVO_AS_READ = "MARK_RECIPIENT_CONVO_AS_READ";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -72,7 +72,7 @@ export const clearSearchedUsers = () => {
 export const addConversation = (recipientId, message, conversation) => {
   return {
     type: ADD_CONVERSATION,
-    payload: { recipientId,  message, conversation },
+    payload: { recipientId, message, conversation },
   };
 };
 
@@ -91,6 +91,13 @@ export const messageWasRead = (message) => {
   };
 };
 
+export const markRecipientConversationAsRead = (conversation, currentUser) => {
+  return {
+    type: MARK_RECIPIENT_CONVO_AS_READ,
+    conversation,
+    currentUser,
+  };
+};
 
 // REDUCER
 
@@ -111,16 +118,11 @@ const reducer = (state = [], action) => {
     case CLEAR_SEARCHED_USERS:
       return state.filter((convo) => convo.id);
     case ADD_CONVERSATION:
-      return addNewConvoToStore(
-        state,
-        action.payload
-      );
+      return addNewConvoToStore(state, action.payload);
     case MARK_CONVO_AS_READ:
-      return markAllMessagesAsRead(
-        state,
-        action.conversation,
-        action.currentUser
-      );
+      return markAllMessagesAsRead(state, action);
+    case MARK_RECIPIENT_CONVO_AS_READ:
+      return markAllMessagesAsRead(state, action);
     case MARK_MESSAGE_AS_READ:
       return markMessageAsRead(state, action.message);
     default:

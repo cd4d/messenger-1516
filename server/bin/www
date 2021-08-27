@@ -41,22 +41,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    console.log("newmsg data", data);
     socket.broadcast.emit("new-message", {
       message: data.message,
       sender: data.sender,
-      conversation:data.conversation
+      conversation: data.conversation,
     });
   });
-  socket.on("message-read", (message) => {
-    console.log("msg read data", message);
-    socket.broadcast.emit("message-read", {
+  socket.on("reading-message", (message) => {
+    socket.broadcast.emit("message-was-read", {
       message,
     });
   });
-  socket.on("conversation-read", (conversation) => {
-    console.log("conversation read", conversation);
-    socket.broadcast.emit("convo-read-status", {
+  socket.on("reading-conversation", (conversation) => {
+    socket.broadcast.emit("recipient-has-read-all", {
       conversation,
     });
   });

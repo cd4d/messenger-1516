@@ -82,7 +82,7 @@ router.get("/", async (req, res, next) => {
     next(error);
   }
 });
-
+// set all unread counts to 0 in the conversation and messages
 router.patch("/markConvoAsRead", async (req, res, next) => {
   try {
     if (!req.user) {
@@ -93,20 +93,19 @@ router.patch("/markConvoAsRead", async (req, res, next) => {
     });
     let updatedConversation;
     if (targetConversation) {
+      if (req.user.id === targetConversation.dataValues.user1Id) {
+        updatedConversation = await Conversation.update(
+          { userOneUnreadCount: 0 },
+          { returning: true, plain: true, where: { id: req.body.convoId } }
+        );
+      } else if (req.user.id === targetConversation.dataValues.user2Id) {
+        updatedConversation = await Conversation.update(
+          { userTwoUnreadCount: 0 },
+          { returning: true, plain: true, where: { id: req.body.convoId } }
+        );
+      }
     }
-    if (req.user.id === targetConversation.dataValues.user1Id) {
-      updatedConversation = await Conversation.update(
-        { userOneUnreadCount: 0 },
-        { returning: true, plain: true, where: { id: req.body.convoId } }
-      );
-    } else if (req.user.id === targetConversation.dataValues.user2Id) {
-      updatedConversation = await Conversation.update(
-        { userTwoUnreadCount: 0 },
-        { returning: true, plain: true, where: { id: req.body.convoId } }
-      );
-    }
-
-    const updatedMessages = await Message.update(
+    await Message.update(
       { isUnread: false },
       {
         where: {

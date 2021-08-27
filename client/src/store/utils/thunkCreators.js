@@ -82,16 +82,13 @@ export const fetchConversations = () => async (dispatch) => {
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
-  console.log("savemsg data", data);
   return data;
 };
 
 const sendMessage = (data, body) => {
-  console.log("sendmsg data", data);
-  console.log("sendmsg body", body);
   const conversation = data.newConversation
-      ? data.newConversation
-      : data.updatedConversation[0][0][0];
+    ? data.newConversation
+    : data.updatedConversation[0][0][0];
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
@@ -101,12 +98,11 @@ const sendMessage = (data, body) => {
 };
 
 export const sendReadUpdate = (message) => {
-  console.log("emit read update");
-  socket.emit("message-read", message);
+  socket.emit("reading-message", message);
 };
 
 const sendReadConvo = (conversation) => {
-  socket.emit("conversation-read", conversation);
+  socket.emit("reading-conversation", conversation);
 };
 
 // message format to send: {recipientId, text, conversationId}
@@ -114,7 +110,6 @@ const sendReadConvo = (conversation) => {
 export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
-    console.log("postmsg data", data);
     const conversation = data.newConversation
       ? data.newConversation
       : data.updatedConversation[0][0][0];
@@ -140,22 +135,33 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const activeChatThunk = (
-  convoId,
-  otherUserId,
-  otherUserName,
-  currentUser
-) => async (dispatch) => {
-  if (convoId) {
-    const { data } = await axios.patch("api/conversations/markConvoAsRead", {
-      convoId,
-    });
-    if (data && data.updatedConversation) {
-      const conversation = data.updatedConversation[1];
-      dispatch(markConversationAsRead(conversation, currentUser));
+const updateConvoState = (convoId, currentUser) => async (dispatch) => {
 
-      sendReadConvo(conversation);
-    }
+  const { data } = await axios.patch("api/conversations/markConvoAsRead", {
+    convoId,
+  });
+  if (data && data.updatedConversation) {
+    const updatedConversation = data.updatedConversation[1];
+    dispatch(markConversationAsRead(updatedConversation, currentUser));
+    sendReadConvo(updatedConversation);
   }
-  dispatch(setActiveChat(convoId, otherUserId, otherUserName));
+};
+
+export const activeChatThunk = (conversation, currentUser) => async (
+  dispatch,
+  getState
+) => {
+  const activeConvoId = getState().activeConversation.convoId;
+  const isNotSameConvo = conversation.id !== activeConvoId;
+
+  const hasUnreadMessages =
+    (conversation.user1Id === currentUser.id &&
+      conversation.userOneUnreadCount > 0) ||
+    (conversation.user2Id === currentUser.id &&
+      conversation.userTwoUnreadCount > 0);
+
+  if (isNotSameConvo && hasUnreadMessages) {
+    dispatch(updateConvoState(conversation.id, currentUser));
+  }
+  dispatch(setActiveChat(conversation));
 };

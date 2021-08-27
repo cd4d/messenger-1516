@@ -51,6 +51,7 @@ const OtherUserBubble = (props) => {
         <Box className={classes.bubble}>
           <Typography className={isUnread ? classes.unread : classes.text}>{text}</Typography>
         </Box>
+        
       </Box>
     </Box>
   );

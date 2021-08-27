@@ -1,3 +1,6 @@
+import { MARK_CONVO_AS_READ } from "../conversations";
+import { MARK_RECIPIENT_CONVO_AS_READ } from "../conversations";
+
 export const addMessageToStore = (state, payload) => {
   const { message, sender, conversation } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
@@ -109,13 +112,21 @@ export const sortMessagesByDate = (conversations) => {
   }));
 };
 
-export const markAllMessagesAsRead = (state, conversation, currentUser) => {
+export const markAllMessagesAsRead = (state, action) => {
+  const { type, conversation, currentUser } = action;
   return state.map((convo) => {
     if (convo.id === conversation.id) {
-      const messagesCopy = convo.messages.map((msg) => ({
-        ...msg,
-        isUnread: false,
-      }));
+      let messagesCopy = [...convo.messages];
+      if (type === MARK_CONVO_AS_READ) {
+        messagesCopy = convo.messages.map((msg) =>
+          msg.senderId !== currentUser.id ? { ...msg, isUnread: false } : msg
+        );
+      } else if (type === MARK_RECIPIENT_CONVO_AS_READ) {
+        messagesCopy = convo.messages.map((msg) =>
+          msg.senderId === currentUser.id ? { ...msg, isUnread: false } : msg
+        );
+      }
+
       const convoCopy = {
         ...convo,
         userOneUnreadCount: conversation.userOneUnreadCount,
@@ -123,16 +134,12 @@ export const markAllMessagesAsRead = (state, conversation, currentUser) => {
         messages: messagesCopy,
       };
 
-      // convoCopy.messages.map((msg) =>
-      //   msg.senderId !== currentUser.id ? (msg.isUnread = false) : msg
-      // );
       return convoCopy;
     } else {
       return convo;
     }
   });
 };
-
 
 export const markMessageAsRead = (state, data) => {
   return state.map((convo) => {
@@ -141,8 +148,8 @@ export const markMessageAsRead = (state, data) => {
         ...convo,
         messages: convo.messages.map((msg) =>
           msg.id === data.message.id ? { ...msg, isUnread: false } : msg
-        )
-      }
+        ),
+      };
       return convoCopy;
     }
     return convo;

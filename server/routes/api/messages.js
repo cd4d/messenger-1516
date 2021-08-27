@@ -64,7 +64,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-
+// mark message as read and decrement userOneUnreadCount or userTwoUnreadCount in the conversation
 router.patch("/markRead", async (req, res, next) => {
   try {
     let updatedConvo;
