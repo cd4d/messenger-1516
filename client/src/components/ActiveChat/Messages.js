@@ -12,30 +12,22 @@ const Messages = (props) => {
       {messages.map((message, idx) => {
         const time = moment(message.createdAt).format("h:mm");
 
-        return message.senderId !== userId ? (
+        return message.senderId === userId ? (
+          <SenderBubble
+            key={uuidv4()}
+            text={message.text}
+            time={time}
+            isUnread={message.isUnread || false}
+            isLastRead={idx === lastReadIndex}
+            otherUser={otherUser}
+          />
+        ) : (
           <OtherUserBubble
             key={uuidv4()}
             text={message.text}
             time={time}
             otherUser={otherUser}
             isUnread={message.isUnread || false}
-          />
-          
-        ) : idx !== lastReadIndex ? (
-          <SenderBubble
-            key={uuidv4()}
-            text={message.text}
-            time={time}
-            isUnread={message.isUnread || false}
-          />
-        ) : (
-          <SenderBubble
-            key={uuidv4()}
-            text={message.text}
-            time={time}
-            isUnread={message.isUnread || false}
-            isLastRead={true}
-            otherUser={otherUser}
           />
         );
       })}
