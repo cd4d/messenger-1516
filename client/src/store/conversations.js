@@ -5,6 +5,8 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   sortMessagesByDate,
+  markAllMessagesAsRead,
+  markMessageAsRead,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -16,7 +18,9 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
-
+const MARK_MESSAGE_AS_READ = "MARK_MESSAGE_AS_READ";
+export const MARK_CONVO_AS_READ = "MARK_CONVO_AS_READ";
+export const MARK_RECIPIENT_CONVO_AS_READ = "MARK_RECIPIENT_CONVO_AS_READ";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
@@ -26,10 +30,14 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender) => {
+export const setNewMessage = (message, sender, conversation) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: {
+      message,
+      sender: sender || null,
+      conversation: conversation || null, // conversation with updated unread counts
+    },
   };
 };
 
@@ -61,10 +69,33 @@ export const clearSearchedUsers = () => {
 };
 
 // add new conversation when sending a new message
-export const addConversation = (recipientId, newMessage) => {
+export const addConversation = (recipientId, message, conversation) => {
   return {
     type: ADD_CONVERSATION,
-    payload: { recipientId, newMessage },
+    payload: { recipientId, message, conversation },
+  };
+};
+
+export const markConversationAsRead = (conversation, currentUser) => {
+  return {
+    type: MARK_CONVO_AS_READ,
+    conversation,
+    currentUser,
+  };
+};
+
+export const messageWasRead = (message) => {
+  return {
+    type: MARK_MESSAGE_AS_READ,
+    message,
+  };
+};
+
+export const markRecipientConversationAsRead = (conversation, currentUser) => {
+  return {
+    type: MARK_RECIPIENT_CONVO_AS_READ,
+    conversation,
+    currentUser,
   };
 };
 
@@ -87,11 +118,13 @@ const reducer = (state = [], action) => {
     case CLEAR_SEARCHED_USERS:
       return state.filter((convo) => convo.id);
     case ADD_CONVERSATION:
-      return addNewConvoToStore(
-        state,
-        action.payload.recipientId,
-        action.payload.newMessage
-      );
+      return addNewConvoToStore(state, action.payload);
+    case MARK_CONVO_AS_READ:
+      return markAllMessagesAsRead(state, action);
+    case MARK_RECIPIENT_CONVO_AS_READ:
+      return markAllMessagesAsRead(state, action);
+    case MARK_MESSAGE_AS_READ:
+      return markMessageAsRead(state, action.message);
     default:
       return state;
   }

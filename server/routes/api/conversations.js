@@ -18,7 +18,13 @@ router.get("/", async (req, res, next) => {
           user2Id: userId,
         },
       },
-      attributes: ["id"],
+      attributes: [
+        "id",
+        "user1Id",
+        "user2Id",
+        "userOneUnreadCount",
+        "userTwoUnreadCount",
+      ],
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
@@ -71,8 +77,49 @@ router.get("/", async (req, res, next) => {
       convoJSON.latestMessageText = convoJSON.messages[0].text;
       conversations[i] = convoJSON;
     }
-
     res.json(conversations);
+  } catch (error) {
+    next(error);
+  }
+});
+// set all unread counts to 0 in the conversation and messages
+router.patch("/markConvoAsRead", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const targetConversation = await Conversation.findOne({
+      where: { id: req.body.convoId },
+    });
+    let updatedConversation;
+    if (targetConversation) {
+      if (req.user.id === targetConversation.dataValues.user1Id) {
+        updatedConversation = await Conversation.update(
+          { userOneUnreadCount: 0 },
+          { returning: true, plain: true, where: { id: req.body.convoId } }
+        );
+      } else if (req.user.id === targetConversation.dataValues.user2Id) {
+        updatedConversation = await Conversation.update(
+          { userTwoUnreadCount: 0 },
+          { returning: true, plain: true, where: { id: req.body.convoId } }
+        );
+      }
+    }
+    await Message.update(
+      { isUnread: false },
+      {
+        where: {
+          [Op.and]: [
+            { senderId: { [Op.not]: req.user.id } },
+            {
+              conversationId: req.body.convoId,
+            },
+          ],
+        },
+        returning: true,
+      }
+    );
+    res.send({ updatedConversation });
   } catch (error) {
     next(error);
   }

@@ -5,7 +5,9 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  markConversationAsRead,
 } from "../conversations";
+import { setActiveChat } from "../activeConversation";
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -84,11 +86,23 @@ const saveMessage = async (body) => {
 };
 
 const sendMessage = (data, body) => {
+  const conversation = data.newConversation
+    ? data.newConversation
+    : data.updatedConversation[0][0][0];
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
+    conversation: conversation,
   });
+};
+
+export const sendReadUpdate = (message) => {
+  socket.emit("reading-message", message);
+};
+
+const sendReadConvo = (conversation) => {
+  socket.emit("reading-conversation", conversation);
 };
 
 // message format to send: {recipientId, text, conversationId}
@@ -96,13 +110,17 @@ const sendMessage = (data, body) => {
 export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
-
-    if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
-    } else {
-      dispatch(setNewMessage(data.message));
+    const conversation = data.newConversation
+      ? data.newConversation
+      : data.updatedConversation[0][0][0];
+    if (data) {
+      if (!body.conversationId) {
+        dispatch(addConversation(body.recipientId, data.message, conversation));
+      } else {
+        dispatch(setNewMessage(data.message, data.sender, conversation));
+      }
+      sendMessage(data, body);
     }
-    sendMessage(data, body);
   } catch (error) {
     console.error(error);
   }
@@ -115,4 +133,35 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const updateConvoState = (convoId, currentUser) => async (dispatch) => {
+
+  const { data } = await axios.patch("api/conversations/markConvoAsRead", {
+    convoId,
+  });
+  if (data && data.updatedConversation) {
+    const updatedConversation = data.updatedConversation[1];
+    dispatch(markConversationAsRead(updatedConversation, currentUser));
+    sendReadConvo(updatedConversation);
+  }
+};
+
+export const activeChatThunk = (conversation, currentUser) => async (
+  dispatch,
+  getState
+) => {
+  const activeConvoId = getState().activeConversation.convoId;
+  const isNotSameConvo = conversation.id !== activeConvoId;
+
+  const hasUnreadMessages =
+    (conversation.user1Id === currentUser.id &&
+      conversation.userOneUnreadCount > 0) ||
+    (conversation.user2Id === currentUser.id &&
+      conversation.userTwoUnreadCount > 0);
+
+  if (isNotSameConvo && hasUnreadMessages) {
+    dispatch(updateConvoState(conversation.id, currentUser));
+  }
+  dispatch(setActiveChat(conversation));
 };

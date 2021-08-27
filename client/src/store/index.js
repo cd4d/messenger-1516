@@ -6,7 +6,13 @@ import user from "./user";
 import conversations from "./conversations";
 import activeConversation from "./activeConversation";
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers =
+  (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      trace: true,
+      traceLimit: 25,
+    })) ||
+  compose;
 
 const CLEAR_ON_LOGOUT = "CLEAR_ON_LOGOUT";
 
