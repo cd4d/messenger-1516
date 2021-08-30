@@ -109,7 +109,7 @@ const sendReadConvo = (conversation) => {
 // conversationId will be set to null if it's a brand new conversation
 export const postMessage = (body) => async (dispatch) => {
   try {
-    const data = await saveMessage(body);
+    const data =  await saveMessage(body);
     const conversation = data.newConversation
       ? data.newConversation
       : data.updatedConversation[0][0][0];

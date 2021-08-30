@@ -3,7 +3,6 @@ const { User } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
-// find users by username
 router.get("/:username", async (req, res, next) => {
   try {
     if (!req.user) {
